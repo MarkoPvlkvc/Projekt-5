@@ -45,7 +45,7 @@ export const useTasksStore = defineStore('tasks', {
     },
 
     addTask(title: string, description: string) {
-      this.tasks.push({ id: this.tasks.length - 1, title, description, completed: false })
+      this.tasks.push({ id: this.tasks.length, title, description, completed: false })
     },
   },
 })
