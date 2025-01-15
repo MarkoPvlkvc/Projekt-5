@@ -65,15 +65,24 @@ main {
 <script lang="ts">
 import { useTasksStore } from '@/stores/taskStore'
 import { storeToRefs } from 'pinia'
+import { computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 
 export default {
   setup() {
     const route = useRoute()
     const tasksStore = useTasksStore()
-    const { tasks } = storeToRefs(tasksStore)
+    const { tasks, tasksFetched } = storeToRefs(tasksStore)
+    const { fetchTasks } = tasksStore
 
-    const task = tasks.value.find((task) => task.id === Number(route.path.split('/')[2]))
+    const taskId = computed(() => Number(route.path.split('/')[2]))
+    const task = computed(() => tasks.value.find((task) => task.id === taskId.value))
+
+    onMounted(() => {
+      if (!tasksFetched.value) {
+        fetchTasks()
+      }
+    })
 
     return {
       route,
