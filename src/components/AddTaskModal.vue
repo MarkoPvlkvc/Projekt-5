@@ -126,6 +126,10 @@ export default defineComponent({
       const newTitle = document.getElementById('new-task-title')! as HTMLInputElement
       const newDescription = document.getElementById('new-task-description')! as HTMLInputElement
 
+      if (newTitle.value === '' || newDescription.value === '') {
+        return
+      }
+
       addTask(newTitle.value, newDescription.value)
       toggleIsShownProp()
 
