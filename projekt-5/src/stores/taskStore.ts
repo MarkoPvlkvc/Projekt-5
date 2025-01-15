@@ -12,6 +12,7 @@ export const useTasksStore = defineStore('tasks', {
     tasks: <Task[]>[],
     loading: false,
     error: '',
+    tasksFetched: false,
   }),
   actions: {
     async fetchTasks() {
@@ -32,6 +33,7 @@ export const useTasksStore = defineStore('tasks', {
         this.error = (err as ErrorEvent).message
       } finally {
         this.loading = false
+        this.tasksFetched = true
       }
     },
 
@@ -40,6 +42,10 @@ export const useTasksStore = defineStore('tasks', {
       if (task) {
         task.completed = completed
       }
+    },
+
+    addTask(title: string, description: string) {
+      this.tasks.push({ id: this.tasks.length - 1, title, description, completed: false })
     },
   },
 })

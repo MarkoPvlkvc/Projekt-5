@@ -7,7 +7,7 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        margin-top: 192px;
+        padding: 192px 0px 64px 0px;
       "
     >
       <div style="display: flex; justify-content: space-between; width: 100%">
@@ -16,7 +16,9 @@
             >({{ taskCount }})</sup
           >
         </h1>
-        <button :disabled="loading" class="add-task-button">Add Task</button>
+        <button @click="toggleAddTaskModal" :disabled="loading" class="add-task-button">
+          Add Task
+        </button>
       </div>
 
       <TaskFilter />
@@ -29,17 +31,21 @@
           @toggleTask="toggleTaskCompletion"
         />
       </ul>
+
       <img src="/src/assets/load.svg" alt="loading icon" v-if="loading" class="loading-icon" />
     </div>
+
+    <AddTaskModal v-model="addTaskModalShown" />
   </main>
 </template>
 
 <style scoped>
 main {
-  height: 100dvh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   align-items: center;
+  overflow-x: hidden;
 }
 
 .loading-icon {
@@ -89,8 +95,9 @@ main {
 <script lang="ts">
 import TaskItem from '@/components/TaskItem.vue'
 import TaskFilter from '@/components/TaskFilter.vue'
+import AddTaskModal from '@/components/AddTaskModal.vue'
 
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useTasksStore } from '@/stores/taskStore'
 import { storeToRefs } from 'pinia'
 import { useTaskFilterStore } from '@/stores/taskFilterStore'
@@ -99,17 +106,24 @@ export default {
   components: {
     TaskItem,
     TaskFilter,
+    AddTaskModal,
   },
 
   setup() {
     const tasksStore = useTasksStore()
-    const { tasks, loading, error } = storeToRefs(tasksStore)
+    const { tasks, loading, error, tasksFetched } = storeToRefs(tasksStore)
     const { fetchTasks, toggleTaskCompletion } = tasksStore
 
     const taskFilterStore = useTaskFilterStore()
     const { selectedFilter } = storeToRefs(taskFilterStore)
 
-    onMounted(fetchTasks)
+    const addTaskModalShown = ref(false)
+
+    onMounted(() => {
+      if (!tasksFetched.value) {
+        fetchTasks()
+      }
+    })
 
     const taskCount = computed(() => {
       return tasks.value.filter((task) => !task.completed).length
@@ -125,12 +139,18 @@ export default {
       }
     })
 
+    const toggleAddTaskModal = () => {
+      addTaskModalShown.value = !addTaskModalShown.value
+    }
+
     return {
       filteredTasks,
       loading,
       error,
       toggleTaskCompletion,
       taskCount,
+      addTaskModalShown,
+      toggleAddTaskModal,
     }
   },
 }
