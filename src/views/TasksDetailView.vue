@@ -43,6 +43,8 @@
         </div>
       </div>
 
+      <img src="/src/assets/load.svg" alt="loading icon" v-if="loading" class="loading-icon" />
+
       <RouterLink
         to="/"
         style="color: hsl(0, 0%, 90%); font-weight: 400; margin: 36px auto 0px auto"
@@ -60,6 +62,20 @@ main {
   align-items: center;
   overflow-x: hidden;
 }
+
+.loading-icon {
+  margin-top: 72px;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
 </style>
 
 <script lang="ts">
@@ -72,7 +88,7 @@ export default {
   setup() {
     const route = useRoute()
     const tasksStore = useTasksStore()
-    const { tasks, tasksFetched } = storeToRefs(tasksStore)
+    const { tasks, tasksFetched, loading } = storeToRefs(tasksStore)
     const { fetchTasks } = tasksStore
 
     const taskId = computed(() => Number(route.path.split('/')[2]))
@@ -87,6 +103,7 @@ export default {
     return {
       route,
       task,
+      loading,
     }
   },
 }
